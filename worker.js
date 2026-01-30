@@ -7302,24 +7302,6 @@ addEventListener('fetch', event => {
   }
   event.respondWith(worker.handleRequest(event.request));
 });
-  
-  // Check and execute scheduled tasks
-  const tasks = await worker.engine.listScheduledTasks();
-  const now = Date.now();
-  
-  for (const task of tasks) {
-    if (task.active && task.nextRun && task.nextRun <= now) {
-      await worker.engine.executeScheduledTask(task);
-    }
-  }
-  
-  // Check alerts
-  await worker.engine.checkAlerts();
-  
-  // Run maintenance
-  await worker.engine.autoCompact();
-  await worker.engine.maintainQuantumCoherence();
-}
 
 // Export for testing
 if (typeof module !== 'undefined') {
