@@ -7294,14 +7294,18 @@ class BLStorageWorker {
   }
 }
 
-// Create worker instance only when needed
+// Create worker instance
 let worker;
-addEventListener('fetch', event => {
-  if (!worker) {
-    worker = new BLStorageWorker();
+
+// Cloudflare Workers export
+export default {
+  async fetch(request, env, ctx) {
+    if (!worker) {
+      worker = new BLStorageWorker();
+    }
+    return worker.handleRequest(request);
   }
-  event.respondWith(worker.handleRequest(event.request));
-});
+};
 
 // Export for testing
 if (typeof module !== 'undefined') {
