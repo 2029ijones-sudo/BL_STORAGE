@@ -1,6 +1,6 @@
 name = "bl-storage-api"
-main = "worker.js"
-compatibility_date = "2024-01-31"
+main = "dist/worker.js"  # Changed from worker.js to dist/worker.js
+compatibility_date = "2026-01-30"  # Updated to current date
 compatibility_flags = ["nodejs_compat"]
 
 [env.production]
@@ -18,8 +18,13 @@ BL_ENABLE_QUANTUM_INDEX = "true"
 [build]
 command = "npm run build"
 
-[build.upload]
-format = "service-worker"
+# Add Durable Objects bindings section
+[durable_objects]
+bindings = [
+  { name = "BL_STORAGE", class_name = "BLStorage" },
+  { name = "BL_USER", class_name = "BLUser" },
+  { name = "BL_INDEX", class_name = "BLIndex" }
+]
 
 [[migrations]]
 tag = "v1"
