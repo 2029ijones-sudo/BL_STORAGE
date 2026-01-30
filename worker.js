@@ -375,7 +375,7 @@ class BLQuantumIndex {
       'standard': [[1, 0], [0, 1]],
       'hadamard': [[1/Math.sqrt(2), 1/Math.sqrt(2)], [1/Math.sqrt(2), -1/Math.sqrt(2)]],
       'circular': [[Math.cos(Math.PI/4), -Math.sin(Math.PI/4)], [Math.sin(Math.PI/4), Math.cos(Math.PI/4)]],
-      'phase': [[1, 0], [0, Math.cos(Math.PI/2) + Math.sin(Math.PI/2) * 1j]]
+     'phase': [[1, 0], [0, Math.cos(Math.PI/2) + Math.sin(Math.PI/2)]]
     };
     
     return bases[basisName] || bases.standard;
