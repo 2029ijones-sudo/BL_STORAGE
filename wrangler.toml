@@ -1,5 +1,5 @@
 name = "bl-storage-api"
-main = "src/worker.js"
+main = "worker.js"
 compatibility_date = "2024-01-31"
 compatibility_flags = ["nodejs_compat"]
 
