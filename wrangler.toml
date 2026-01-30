@@ -1,0 +1,29 @@
+name = "bl-storage-api"
+main = "src/worker.js"
+compatibility_date = "2024-01-31"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+workers_dev = true
+routes = [
+  { pattern = "api.blstorage.dev/*", zone_name = "blstorage.dev" }
+]
+
+[vars]
+BL_SECRET_KEY = "{{BL_ENCRYPTION_KEY}}"
+BL_MAX_STORAGE_MB = "1024"
+BL_REPLICATION_FACTOR = "3"
+BL_ENABLE_QUANTUM_INDEX = "true"
+
+[build]
+command = "npm run build"
+
+[build.upload]
+format = "service-worker"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["BLStorage", "BLUser", "BLIndex"]
+
+[placement]
+mode = "smart"
