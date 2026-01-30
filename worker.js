@@ -9,7 +9,6 @@ class BLQuantumIndex {
     this.entanglementGraph = new Map();
     this.collapsedStates = new Map();
     this.quantumEntropyPool = new Uint32Array(1024);
-    crypto.getRandomValues(this.quantumEntropyPool);
   }
 
   async createSuperposition(key, values) {
@@ -7295,21 +7294,14 @@ class BLStorageWorker {
   }
 }
 
-// Create worker instance
-const worker = new BLStorageWorker();
-
-// Handle fetch events
+// Create worker instance only when needed
+let worker;
 addEventListener('fetch', event => {
+  if (!worker) {
+    worker = new BLStorageWorker();
+  }
   event.respondWith(worker.handleRequest(event.request));
 });
-
-// Handle scheduled events (for cron triggers)
-addEventListener('scheduled', event => {
-  event.waitUntil(handleScheduled(event));
-});
-
-async function handleScheduled(event) {
-  const worker = new BLStorageWorker();
   
   // Check and execute scheduled tasks
   const tasks = await worker.engine.listScheduledTasks();
