@@ -1,4 +1,4 @@
-/// ====================
+// ====================
 // BL STORAGE PRODUCTION ENGINE
 // ====================
 
@@ -8,86 +8,50 @@ class BLQuantumIndex {
     this.superpositionCache = new Map();
     this.entanglementGraph = new Map();
     this.collapsedStates = new Map();
-    this.quantumEntropyPool = null; // Don't initialize here!
-  }
-
-  // Initialize crypto on first use
-  ensureInitialized() {
-    if (!this.quantumEntropyPool) {
-      this.quantumEntropyPool = new Uint32Array(1024);
-      crypto.getRandomValues(this.quantumEntropyPool);
-    }
+    this.quantumEntropyPool = new Uint32Array(1024);
+    crypto.getRandomValues(this.quantumEntropyPool);
   }
 
   async createSuperposition(key, values) {
-    try {
-      this.ensureInitialized(); // Initialize here
-      
-      if (!Array.isArray(values) || values.length < 2) {
-        throw new Error('Quantum superposition requires at least 2 possible states');
-      }
-      
-      const quantumSeed = crypto.getRandomValues(new Uint8Array(64));
-      const waveform = await this.generateWaveform(values);
-      
-      const superposition = {
-        id: `qsp_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`,
-        states: await Promise.all(values.map((v, i) => 
-          this.encodeQuantumState(v, quantumSeed, i, values.length)
-        )),
-        amplitudes: waveform.amplitudes,
-        phases: waveform.phases,
-        qubit: quantumSeed,
-        collapsed: false,
-        interferencePattern: await this.generateInterference(values),
-        coherenceTime: Date.now() + 3600000, // 1 hour coherence
-        createdAt: Date.now(),
-        collapseThreshold: 0.8,
-        originalValues: values
-      };
-      
-      this.superpositionCache.set(key, superposition);
-      
-      // Register quantum state transitions
-      for (let i = 0; i < values.length; i++) {
-        const stateKey = `${key}_state_${i}`;
-        this.quantumState.set(stateKey, {
-          parent: key,
-          index: i,
-          amplitude: waveform.amplitudes[i],
-          phase: waveform.phases[i],
-          encoded: superposition.states[i]
-        });
-      }
-      
-      return superposition;
-    } catch (error) {
-      console.error(`Failed to create superposition for key ${key}:`, error);
-      throw error;
+    const quantumSeed = crypto.getRandomValues(new Uint8Array(64));
+    const waveform = await this.generateWaveform(values);
+    
+    const superposition = {
+      id: `qsp_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`,
+      states: await Promise.all(values.map((v, i) => 
+        this.encodeQuantumState(v, quantumSeed, i, values.length)
+      )),
+      amplitudes: waveform.amplitudes,
+      phases: waveform.phases,
+      qubit: quantumSeed,
+      collapsed: false,
+      interferencePattern: await this.generateInterference(values),
+      coherenceTime: Date.now() + 3600000, // 1 hour coherence
+      createdAt: Date.now(),
+      collapseThreshold: 0.8
+    };
+    
+    this.superpositionCache.set(key, superposition);
+    
+    // Register quantum state transitions
+    for (let i = 0; i < values.length; i++) {
+      const stateKey = `${key}_state_${i}`;
+      this.quantumState.set(stateKey, {
+        parent: key,
+        index: i,
+        amplitude: waveform.amplitudes[i],
+        phase: waveform.phases[i],
+        encoded: superposition.states[i]
+      });
     }
+    
+    return superposition;
   }
 
-  quantumRandom() {
-    this.ensureInitialized(); // Initialize here too
-    
-    const now = Date.now();
-    const entropyIndex = now % this.quantumEntropyPool.length;
-    const entropyValue = this.quantumEntropyPool[entropyIndex];
-    
-    // Update entropy pool
-    this.quantumEntropyPool[entropyIndex] ^= (now & 0xFFFFFFFF);
-    crypto.getRandomValues(new Uint32Array(this.quantumEntropyPool.buffer, entropyIndex * 4, 1));
-    
-    return ((entropyValue ^ (now >> 32)) / 0xFFFFFFFF);
-  }
-
-  // ... rest of your BLQuantumIndex methods stay the same as you have them
-}
-
-    async collapseSuperposition(key, measurementBasis = 'standard') {
+  async collapseSuperposition(key, measurementBasis = 'standard') {
     const superposition = this.superpositionCache.get(key);
     if (!superposition) throw new Error(`Quantum superposition ${key} not found`);
-
+    
     // Quantum measurement with basis transformation
     const basisMatrix = await this.getMeasurementBasis(measurementBasis);
     const probabilities = superposition.amplitudes.map((amp, i) => {
