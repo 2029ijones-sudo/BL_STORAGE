@@ -3638,15 +3638,15 @@ class BLStorageEngine {
     return (timeScore + resultScore) / 2;
   }
 
-  getMigrationRules(fromVersion, toVersion) {
+  getMigrationRules(fromVersion, toVersion, item = null) {
     // Define migration rules between versions
     const rules = {
       '1.0': {
         '2.0': {
           metadata: {
             version: '2.0',
-            dimensions: ['legacy', ...(item.metadata.dimensions || ['default'])],
-            compression: item.metadata.compression || 'none'
+            dimensions: ['legacy', ...(item?.metadata?.dimensions || ['default'])],
+            compression: item?.metadata?.compression || 'none'
           },
           transformations: [
             { field: 'timestamp', action: 'convertToISO' },
@@ -3660,7 +3660,6 @@ class BLStorageEngine {
     
     return rules[fromVersion]?.[toVersion] || { metadata: {}, transformations: [] };
   }
-
   applyMigrationRules(item, rules) {
     let migratedItem = { ...item };
     
