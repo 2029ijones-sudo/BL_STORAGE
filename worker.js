@@ -84,10 +84,10 @@ class BLQuantumIndex {
   // ... rest of your BLQuantumIndex methods stay the same as you have them
 }
 
-  async collapseSuperposition(key, measurementBasis = 'standard') {
+    async collapseSuperposition(key, measurementBasis = 'standard') {
     const superposition = this.superpositionCache.get(key);
     if (!superposition) throw new Error(`Quantum superposition ${key} not found`);
-    
+
     // Quantum measurement with basis transformation
     const basisMatrix = await this.getMeasurementBasis(measurementBasis);
     const probabilities = superposition.amplitudes.map((amp, i) => {
